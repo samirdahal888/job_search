@@ -1,12 +1,12 @@
 import json
 import os
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional
 
 import google.generativeai as genai
-from dotenv import load_dotenv
+from config import settings
 
-load_dotenv()
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+genai.configure(api_key=settings.GEMINI_API_KEY)
 model = genai.GenerativeModel("gemini-2.5-flash")
 
 
@@ -209,7 +209,6 @@ def extract_json_from_response(response_text: str) -> Optional[Dict[str, Any]]:
     Returns:
         Parsed JSON dict or None
     """
-    from datetime import datetime, timedelta, timezone
 
     try:
         # Try to find JSON object in response
@@ -273,8 +272,8 @@ def convert_query_to_semantic_and_filter(query):
     response = model.generate_content(
         prompt,
         generation_config=genai.types.GenerationConfig(
-            temperature=0.3,
-            max_output_tokens=10000,
+            temperature=settings.LLM_TEMPERATURE,
+            max_output_tokens=settings.LLM_MAX_TOKENS,
         ),
     )
     print(f"this is the llm response ============= {response}")

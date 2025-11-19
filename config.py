@@ -41,5 +41,11 @@ class Settings(BaseSettings):
     CHUNK_SIZE:int =Field(default=300,description='Text chunk size for splitting')
     CHUNK_OVERLAP: int = Field(default=30,description="overlap between chunks")
 
+    # LLM setting 
+    LLM_TEMPERATURE: float = Field(default=0.3,description="LLM temperature")
+    LLM_MAX_TOKENS:int = Field(default=10000,description="LLM max token output")
+
+    
+
 
 settings = Settings()

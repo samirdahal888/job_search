@@ -1,11 +1,10 @@
 #  LLM response in clear and natural language
 
 import google.generativeai as genai
-from dotenv import load_dotenv
-import os
 
-load_dotenv()
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+from config import settings
+
+genai.configure(api_key=settings.GEMINI_API_KEY)
 model = genai.GenerativeModel("gemini-2.5-flash")
 
 
@@ -16,8 +15,8 @@ def LLM_response(unique_job_results, original_query):
     response = model.generate_content(
         prompt,
         generation_config=genai.types.GenerationConfig(
-            temperature=0.3,
-            max_output_tokens=10000,
+            temperature=settings.LLM_TEMPERATURE,
+            max_output_tokens=settings.LLM_MAX_TOKENS,
         ),
     )
 
