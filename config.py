@@ -30,5 +30,11 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    # API settings
+    API_HOST:str = Field(default='0.0.0.0',description="API host")
+    API_port:int = Field(default=8000,description="API port")
+    MAX_QUERY_RESULT: int = Field(default=20,description="Maximum number of result for a query")
+    DEFAULT_QUERY_RESULT: int =Field(default=3,description="Default number of result per query")
+
 
 settings = Settings()
