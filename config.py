@@ -19,6 +19,10 @@ class Settings(BaseSettings):
         default="lf_job.csv",
         description="Path to the csv file (related to project root)",
     )
+    COLLECTION_NAME: str =Field(
+        default="hybrid_search",
+        description="Qdrant collection name"
+    )
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

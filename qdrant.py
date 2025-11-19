@@ -11,7 +11,7 @@ client = QdrantClient(
 )
 
 # Define the collection name
-collection_name = "hybrid_search"
+collection_name = settings.COLLECTION_NAME
 
 # Create our collection with both sparse (bm25) and dense vectors only if it doesn't exist
 if not client.collection_exists(collection_name):
