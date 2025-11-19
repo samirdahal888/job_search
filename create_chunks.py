@@ -1,10 +1,11 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from config import settings
 
 
 def create_chunks(job_title, description, metadata):
     chunks = []
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=300, chunk_overlap=30, length_function=lambda text: len(text.split())
+        chunk_size=settings.CHUNK_SIZE, chunk_overlap=settings.CHUNK_OVERLAP, length_function=lambda text: len(text.split())
     )
     text_chunks = text_splitter.split_text(description)
     for id, chunk_text in enumerate(text_chunks):
