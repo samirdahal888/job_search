@@ -49,11 +49,11 @@ def make_embedding_save_to_db(chunks_with_metadata, batch_size=50):
                     vector={
                         "dense": models.Document(
                             text=chunk["text"],
-                            model="sentence-transformers/all-MiniLM-L6-v2",
+                            model=settings.DENSE_MODEL,
                         ),
                         "sparse": models.Document(
                             text=chunk["text"],
-                            model="Qdrant/bm25",
+                            model=settings.SPARSE_MODEL,
                         ),
                     },
                     payload={"text": chunk["text"], **chunk["metadata"]},

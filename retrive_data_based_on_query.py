@@ -1,4 +1,5 @@
 from qdrant_client import QdrantClient, models
+from config import settings
 
 from qdrant import client, collection_name
 
@@ -38,13 +39,13 @@ def search(query: str, filters=None, limit=5) -> list[models.ScoredPoint]:
         collection_name=collection_name,
         prefetch=[
             models.Prefetch(
-                query=models.Document(text=query, model="Qdrant/bm25"),
+                query=models.Document(text=query, model=settings.SPARSE_MODEL),
                 using="sparse",
                 limit=20,
             ),
             models.Prefetch(
                 query=models.Document(
-                    text=query, model="sentence-transformers/all-MiniLM-L6-v2"
+                    text=query, model=settings.DENSE_MODEL
                 ),
                 using="dense",
                 limit=20,
