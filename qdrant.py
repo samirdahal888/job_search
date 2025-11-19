@@ -1,15 +1,13 @@
 import os
 import uuid
 
-from dotenv import load_dotenv
 from qdrant_client import QdrantClient, models
 
-load_dotenv()
-
-# from google.colab import userdata
+from config import settings
 
 client = QdrantClient(
-    location=os.getenv("QDRANT_LOCATION"), api_key=os.getenv("QDRANT_API_KEY")
+    location=settings.QDRANT_LOCATION,
+    api_key=settings.QDRANT_API_KEY,
 )
 
 # Define the collection name
