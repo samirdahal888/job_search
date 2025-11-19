@@ -18,6 +18,7 @@ def create_chunks(job_title, description, metadata):
                     "location": metadata.get("location", ""),
                     "company": metadata.get("company", ""),
                     "Level": metadata.get("Level", ""),
+                    "publication_date": metadata.get("publication_date"),
                 },
             }
         )
