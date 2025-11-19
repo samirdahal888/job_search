@@ -44,10 +44,13 @@ def build_parsing_prompt(query):
     2. Extract FILTERS (job level, category, company, location if mentioned)
     3. Only include filters that are explicitly mentioned or strongly implied
     4. Keep semantic query focused on skills, roles, and technologies
-    5 . Keep strong focus that  the sementic_query should not be empty there should be something relevent to the query
-    6. There may be the industry related query like it,sales,marketing so if that occure then make sure that it instry you make category for  Software Engineering
-    - Data and Analytics
-    - Design and UX , similar for others
+    5. Keep strong focus that the semantic_query should not be empty there should be something relevant to the query
+    6. There may be the industry related query like it,sales,marketing so if that occurs then make sure that it industry you make category for Software Engineering, Data and Analytics, Design and UX, similar for others
+    7. For broad location terms, use keywords that will match partial locations:
+       - "Bay Area" → use "San Francisco" or "California" 
+       - "Asia" → use "Asia" or "India" or "China" (will match cities with country names)
+       - "Europe" → use "Europe" or specific countries
+       - Keep the broad term as-is for text matching to work
 
     Return ONLY a JSON object in this exact format:
     {{
@@ -91,9 +94,36 @@ def build_parsing_prompt(query):
 
     Query: "jobs in New York",
     {{
-        "semantic_query": "New York jobs",
+        "semantic_query": "jobs",
         "filters": {{
-            "Location": "New York"
+            "location": "New York"
+        }}
+    }}
+
+    Query: "software engineer in Bay Area"
+    {{
+        "semantic_query": "software engineer",
+        "filters": {{
+            "category": "Software Engineering",
+            "location": "San Francisco"
+        }}
+    }}
+
+    Query: "data analyst jobs in Asia"
+    {{
+        "semantic_query": "data analyst",
+        "filters": {{
+            "category": "Data and Analytics",
+            "location": "India"
+        }}
+    }}
+
+    Query: "senior developer positions in Europe"
+    {{
+        "semantic_query": "developer",
+        "filters": {{
+            "Level": "Senior Level",
+            "location": "Europe"
         }}
     }}
 
