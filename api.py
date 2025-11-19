@@ -34,6 +34,7 @@ class JobResult(BaseModel):
     location: str
     job_level: str
     job_id: str
+    Publication_Date: Optional[str] = None
     Description_snippet: Optional[str] = None
 
 
@@ -71,6 +72,9 @@ def job_query(request: QueryRequest):
         elif k == "filters":
             filter = v
 
+    print(f"\nThis is the semantic part ===={semantic}")
+    print(f"\nThis is the filter part ===={filter}")
+
     filtered_value = apply_filter(filter)
     results = search(semantic, filtered_value, limit=request.top)
 
@@ -93,6 +97,7 @@ def job_query(request: QueryRequest):
                 location=point.payload.get("location", "N/A"),
                 job_level=point.payload.get("Level", "N/A"),
                 job_id=point.payload.get("chunk_id", "N/A"),
+                Publication_Date=point.payload.get("publication_date"),
                 Description_snippet=snippet,
             )
         )
