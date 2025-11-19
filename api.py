@@ -4,6 +4,7 @@ from typing import List, Optional
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
+from config import settings
 from llm_response import LLM_response
 from query_to_semantic_and_filter import convert_query_to_semantic_and_filter
 from remove_duplicate_from_result import (
@@ -22,7 +23,9 @@ app = FastAPI(
 
 class QueryRequest(BaseModel):
     query: str
-    top: int = Field(default=3)
+    top: int = Field(
+        default=settings.DEFAULT_QUERY_RESULT, ge=1, le=settings.MAX_QUERY_RESULT
+    )
 
 
 class JobResult(BaseModel):
