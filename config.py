@@ -36,5 +36,10 @@ class Settings(BaseSettings):
     MAX_QUERY_RESULT: int = Field(default=20,description="Maximum number of result for a query")
     DEFAULT_QUERY_RESULT: int =Field(default=3,description="Default number of result per query")
 
+    # chunks related  settings 
+
+    CHUNK_SIZE:int =Field(default=300,description='Text chunk size for splitting')
+    CHUNK_OVERLAP: int = Field(default=30,description="overlap between chunks")
+
 
 settings = Settings()
