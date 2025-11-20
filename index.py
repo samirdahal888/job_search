@@ -4,18 +4,18 @@ from qdrant_client import models
 from qdrant import client, collection_name
 
 
-def make_index(field_name_to_index):
-    for field_name in field_name_to_index:
-        if field_name =='publication_date':
+def create_field_indexes(field_names):
+    for field_name in field_names:
+        if field_name == "publication_date":
             client.create_payload_index(
-            collection_name=collection_name,
-            field_name=field_name,
-            field_schema=models.DatetimeIndexParams(
-                type=models.DatetimeIndexType.DATETIME,
-                is_principal=True,
-            ),
-)
-      
+                collection_name=collection_name,
+                field_name=field_name,
+                field_schema=models.DatetimeIndexParams(
+                    type=models.DatetimeIndexType.DATETIME,
+                    is_principal=True,
+                ),
+            )
+
         else:
             # Create text index for other fields
             client.create_payload_index(
