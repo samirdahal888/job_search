@@ -1,18 +1,12 @@
 from datetime import datetime
 from typing import List, Optional
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from pydantic import BaseModel, Field
 
 from config import settings
-from llm_response import LLM_response
 from logger import get_logger
-from query_to_semantic_and_filter import convert_query_to_semantic_and_filter
-from remove_duplicate_from_result import (
-    sorted_unique_result_with_hig_score,
-    unique_result_output,
-)
-from retrive_data_based_on_query import apply_filter, search
+from search_service import SearchService, get_search_service
 
 logger = get_logger(__name__)
 
@@ -25,7 +19,7 @@ app = FastAPI(
 
 
 class QueryRequest(BaseModel):
-    query: str
+    query: str = Field(max_length=120, min_length=2)
     top: int = Field(
         default=settings.DEFAULT_QUERY_RESULT, ge=1, le=settings.MAX_QUERY_RESULT
     )
@@ -33,15 +27,15 @@ class QueryRequest(BaseModel):
 
 class JobResult(BaseModel):
     rank: int
-    Score: float
+    score: float
     job_title: str
     company: str
     category: str
     location: Optional[str] = None
     job_level: str
     job_id: str
-    Publication_Date: Optional[str] = None
-    Description_snippet: Optional[str] = None
+    publication_date: Optional[str] = None
+    description_snippet: Optional[str] = None
 
 
 class QueryResponse(BaseModel):
@@ -54,8 +48,8 @@ class QueryResponse(BaseModel):
     timestamp: str
 
 
-@app.get("/", tags=["Home"])
-def home():
+@app.get("/", tags=["Root"])
+def root():
     logger.debug("Home endpoint accessed")
     return {
         "message": "LF Jobs RAG API",
@@ -68,49 +62,49 @@ def home():
 
 
 @app.post("/api/query", response_model=QueryResponse, tags=["Query"])
-def job_query(request: QueryRequest):
-    logger.info(f"New query request : {request.query} ,top : {request.top}")
-    data = convert_query_to_semantic_and_filter(request.query)
-    semantic = None
-    filter = None
+def job_query(
+    request: QueryRequest, search_service: SearchService = Depends(get_search_service)
+):
+    """
+    Search for jobs using natural language query.
 
-    for k, v in data.items():
-        if k == "semantic_query":
-            semantic = v
-        elif k == "filters":
-            filter = v
+    Args:
+        request: Query request containing search query and result limit
+        search_service: Injected search service dependency
 
-    logger.debug(f"Semantic query: {semantic}")
-    logger.debug(f"Filters:{filter}")
-
-    filtered_value = apply_filter(filter)
-    results = search(semantic, filtered_value, limit=request.top)
-
-    unique_outputs = unique_result_output(results)
-    unique_results = sorted_unique_result_with_hig_score(unique_outputs)
-    logger.info(f"Found {len(unique_results)}unique jobs")
-
-    response_from_llm = LLM_response(unique_results, request.query)
+    Returns:
+        QueryResponse with matching jobs and LLM-generated response
+    """
+    unique_results, response_from_llm = (
+        search_service.search_jobs_and_generate_response(request.query, request.top)
+    )
 
     job_result = []
     for i, point in enumerate(unique_results, 1):
         text = point.payload.get("text", "")
-        snippet = text[:300] + "..." if len(text) > 300 else text
+        snippet = (
+            text[: settings.SNIPPET_MAX_LENGTH] + "..."
+            if len(text) > settings.SNIPPET_MAX_LENGTH
+            else text
+        )
 
         job_result.append(
             JobResult(
                 rank=i,
-                Score=point.score,
-                job_title=point.payload.get("job_title", "N/A"),
-                company=point.payload.get("company", "N/A"),
-                category=point.payload.get("category", "N/A"),
-                location=point.payload.get("location", "N/A"),
-                job_level=point.payload.get("Level", "N/A"),
-                job_id=point.payload.get("chunk_id", "N/A"),
-                Publication_Date=point.payload.get("publication_date"),
-                Description_snippet=snippet,
+                score=point.score,
+                job_title=point.payload.get(
+                    "job_title", settings.DEFAULT_MISSING_VALUE
+                ),
+                company=point.payload.get("company", settings.DEFAULT_MISSING_VALUE),
+                category=point.payload.get("category", settings.DEFAULT_MISSING_VALUE),
+                location=point.payload.get("location", settings.DEFAULT_MISSING_VALUE),
+                job_level=point.payload.get("Level", settings.DEFAULT_MISSING_VALUE),
+                job_id=point.payload.get("chunk_id", settings.DEFAULT_MISSING_VALUE),
+                publication_date=point.payload.get("publication_date",settings.DEFAULT_MISSING_VALUE),
+                description_snippet=snippet,
             )
         )
+
     logger.info(f"Query processed successfully, returning {len(job_result)} jobs")
 
     return QueryResponse(
