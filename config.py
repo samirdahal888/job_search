@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     QDRANT_API_KEY: str = Field(..., description="Qdrat cloud API key")
     QDRANT_LOCATION: str = Field(..., description="Qdrant cloud location/URL")
 
-    # Applicaiton settings
+    # Application settings
     CSV_FILE_PATH: str = Field(
         default="lf_job.csv",
         description="Path to the csv file relative path ",
@@ -37,6 +37,12 @@ class Settings(BaseSettings):
     )
     DEFAULT_QUERY_RESULT: int = Field(
         default=3, description="Default number of result per query"
+    )
+    SNIPPET_MAX_LENGTH: int = Field(
+        default=300, description="Maximum length of job description snippet"
+    )
+    DEFAULT_MISSING_VALUE: str = Field(
+        default="N/A", description="Default value for missing or unavailable data"
     )
 
     # chunks related  settings
@@ -63,6 +69,8 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = Field(default="DEBUG", description="LOgging Level")
     LOG_TO_FILE: bool = Field(default=False, description="Enable file logging")
     LOG_TO_CONSOLE: bool = Field(default=True, description="Enable consol logging")
+
+    #
 
     # validating fields contain value
     @field_validator("CSV_FILE_PATH")
