@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 
 
-def clean_html(description):
+def remove_html_tags(description):
     soup = BeautifulSoup(description, "html.parser")
     text = soup.get_text(separator=" ")
 
