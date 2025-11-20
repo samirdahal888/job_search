@@ -7,7 +7,7 @@ from datetime import datetime
 logger = get_logger(__name__)
 
 
-def apply_filter(filter_dict):
+def create_filter_object(filter_dict):
     conditions = []
     logger.debug(f"Building filter condition from :{filter_dict}")
     
