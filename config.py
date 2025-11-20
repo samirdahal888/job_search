@@ -46,12 +46,23 @@ class Settings(BaseSettings):
     # LLM setting
     LLM_TEMPERATURE: float = Field(default=0.3, description="LLM temperature")
     LLM_MAX_TOKENS: int = Field(default=10000, description="LLM max token output")
-    LLM_MODEL:str =Field(default='gemini-2.5-flash',description="Model used in this project") 
+    LLM_MODEL: str = Field(
+        default="gemini-2.5-flash", description="Model used in this project"
+    )
 
-    #sparse model and dense models
-    SPARSE_MODEL:str = Field(default="Qdrant/bm25",description="Model for sparse search")
-    DENSE_MODEL:str =Field(default="sentence-transformers/all-MiniLM-L6-v2",description="Model for dense search")
+    # sparse model and dense models
+    SPARSE_MODEL: str = Field(
+        default="Qdrant/bm25", description="Model for sparse search"
+    )
+    DENSE_MODEL: str = Field(
+        default="sentence-transformers/all-MiniLM-L6-v2",
+        description="Model for dense search",
+    )
 
+    # logging_setting
+    LOG_LEVEL: str = Field(default="DEBUG", description="LOgging Level")
+    LOG_TO_FILE: bool = Field(default=False, description="Enable file logging")
+    LOG_TO_CONSOLE: bool = Field(default=True, description="Enable consol logging")
 
     # validating fields contain value
     @field_validator("CSV_FILE_PATH")
@@ -75,6 +86,17 @@ class Settings(BaseSettings):
         if not v or v.strip() == "":
             raise ValueError(f"{info.field_name} is required but found empty")
         return v.strip()
+
+    @field_validator("LOG_LEVEL")
+    @classmethod
+    def validate_log_level(cls, v):
+        valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+        v_upper = v.upper()
+        if v_upper not in valid_levels:
+            raise ValueError(f"LOG_LEVEL must be one of {valid_levels}")
+
+        return v_upper
+
 
 try:
     settings = Settings()
