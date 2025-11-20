@@ -39,7 +39,7 @@ else:
     logger.info(f"Collection name already exist: {collection_name} using it .")
 
 
-def make_embedding_save_to_db(chunks_with_metadata, batch_size=50):
+def upload_chunks_to_vector_db(chunks_with_metadata, batch_size=50):
     """
     Upload chunks in batches to avoid payload size limits
     """
