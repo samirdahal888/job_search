@@ -1,17 +1,19 @@
 #  LLM response in clear and natural language
 
-import google.generativeai as genai
 from datetime import datetime
+
+import google.generativeai as genai
 
 from config import settings
 from logger import get_logger
+
 logger = get_logger(__name__)
 
 genai.configure(api_key=settings.GEMINI_API_KEY)
 model = genai.GenerativeModel(settings.LLM_MODEL)
 
 
-def LLM_response(unique_job_results, original_query):
+def get_llm_response(unique_job_results, original_query):
     logger.info(f"Generating LLM response for {len(unique_job_results)} jobs")
     formatted_unique_jobs = format_job_for_response(unique_job_results)
     prompt = prompt_for_llm_response(formatted_unique_jobs, original_query)
@@ -26,10 +28,12 @@ def LLM_response(unique_job_results, original_query):
             max_output_tokens=settings.LLM_MAX_TOKENS,
         ),
     )
-    elapsed = (datetime.now()-start_time).total_seconds()
+    elapsed = (datetime.now() - start_time).total_seconds()
     response_text = response.text.strip()
 
-    logger.info(f"LLM response generated in {elapsed:.2f}s , {len(response_text)} chars")
+    logger.info(
+        f"LLM response generated in {elapsed:.2f}s , {len(response_text)} chars"
+    )
     logger.debug(f"Response preview: {response_text[:100]}...")
 
     return response_text
@@ -42,16 +46,32 @@ def format_job_for_response(unique_job_results):
     for i, point in enumerate(unique_job_results, 1):
         data.append(f"Rank:{i}")
         data.append(f"Score: {point.score:.4f}")
-        data.append(f"Job Title: {point.payload.get('job_title', 'N/A')}")
-        data.append(f"Company: {point.payload.get('company', 'N/A')}")
-        data.append(f"Category: {point.payload.get('category', 'N/A')}")
-        data.append(f"Location: {point.payload.get('location', 'N/A')}")
-        data.append(f"Level: {point.payload.get('Level', 'N/A')}")
-        data.append(f"Chunk ID: {point.payload.get('chunk_id', 'N/A')}")
+        data.append(
+            f"Job Title: {point.payload.get('job_title', settings.DEFAULT_MISSING_VALUE)}"
+        )
+        data.append(
+            f"Company: {point.payload.get('company', settings.DEFAULT_MISSING_VALUE)}"
+        )
+        data.append(
+            f"Category: {point.payload.get('category', settings.DEFAULT_MISSING_VALUE)}"
+        )
+        data.append(
+            f"Location: {point.payload.get('location', settings.DEFAULT_MISSING_VALUE)}"
+        )
+        data.append(
+            f"Level: {point.payload.get('Level', settings.DEFAULT_MISSING_VALUE)}"
+        )
+        data.append(
+            f"Chunk ID: {point.payload.get('chunk_id', settings.DEFAULT_MISSING_VALUE)}"
+        )
 
-        # Display text snippet (first 300 characters)
+        # Display text snippet
         text = point.payload.get("text", "")
-        snippet = text[:300] + "..." if len(text) > 300 else text
+        snippet = (
+            text[: settings.SNIPPET_MAX_LENGTH] + "..."
+            if len(text) > settings.SNIPPET_MAX_LENGTH
+            else text
+        )
         data.append(f"Description:{snippet}")
 
     logger.info("Formatting jobs to input in the LLM")
