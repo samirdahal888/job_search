@@ -3,8 +3,10 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional
 
 import google.generativeai as genai
+
 from config import settings
 from logger import get_logger
+
 logger = get_logger(__name__)
 
 genai.configure(api_key=settings.GEMINI_API_KEY)
@@ -246,7 +248,9 @@ def extract_json_from_response(response_text: str) -> Optional[Dict[str, Any]]:
                                 "gt": None,
                                 "lt": None,
                             }
-                            logger.debug(f"converted date_range to propr format from last {days} days")
+                            logger.debug(
+                                f"converted date_range to propr format from last {days} days"
+                            )
                         else:
                             result["filters"]["date_range"] = None
 
@@ -259,7 +263,7 @@ def extract_json_from_response(response_text: str) -> Optional[Dict[str, Any]]:
 
             return result
         else:
-            logger.warning('No JSON object found in LLM response')
+            logger.warning("No JSON object found in LLM response")
             return None
 
     except json.JSONDecodeError as e:
@@ -273,7 +277,7 @@ def convert_query_to_semantic_and_filter(query):
     prompt = build_parsing_prompt(query)
     logger.debug("Sending query to LLM for parsing")
 
-    strat_time = datetime.now()
+    start_time = datetime.now()
 
     response = model.generate_content(
         prompt,
@@ -282,7 +286,7 @@ def convert_query_to_semantic_and_filter(query):
             max_output_tokens=settings.LLM_MAX_TOKENS,
         ),
     )
-    elapsed = (datetime.now()-strat_time).total_seconds()
+    elapsed = (datetime.now() - start_time).total_seconds()
     logger.debug(f"LLM response received in {elapsed:.2f}s")
     result = extract_json_from_response(response.text)
 
