@@ -1,20 +1,27 @@
-import os
 import uuid
 
 from qdrant_client import QdrantClient, models
 
 from config import settings
+from logger import get_logger
 
-client = QdrantClient(
-    location=settings.QDRANT_LOCATION,
-    api_key=settings.QDRANT_API_KEY,
-)
+logger = get_logger(__name__)
 
-# Define the collection name
+try:
+    client = QdrantClient(
+        location=settings.QDRANT_LOCATION,
+        api_key=settings.QDRANT_API_KEY,
+    )
+    logger.info("Successfully connected to Qdrant")
+except Exception as e:
+    logger.error(f"Failed to connect to Qdrant: {e}")
+    raise
+
+
 collection_name = settings.COLLECTION_NAME
 
-# Create our collection with both sparse (bm25) and dense vectors only if it doesn't exist
 if not client.collection_exists(collection_name):
+    logger.info(f"Creating new collection:{collection_name}")
     client.create_collection(
         collection_name=collection_name,
         vectors_config={
@@ -27,9 +34,9 @@ if not client.collection_exists(collection_name):
             "sparse": models.SparseVectorParams(modifier=models.Modifier.IDF)
         },
     )
-    print(f"Created collection: {collection_name}")
+    logger.info(f"Created collection : {collection_name}")
 else:
-    print(f"Collection {collection_name} already exists, using existing collection")
+    logger.info(f"Collection name already exist: {collection_name} using it .")
 
 
 def make_embedding_save_to_db(chunks_with_metadata, batch_size=50):
@@ -37,6 +44,7 @@ def make_embedding_save_to_db(chunks_with_metadata, batch_size=50):
     Upload chunks in batches to avoid payload size limits
     """
     total_chunks = len(chunks_with_metadata)
+    logger.info(f"Starting upload of {total_chunks} chunks in batch of {batch_size}")
 
     for i in range(0, total_chunks, batch_size):
         batch = chunks_with_metadata[i : i + batch_size]
@@ -62,6 +70,7 @@ def make_embedding_save_to_db(chunks_with_metadata, batch_size=50):
             ],
         )
 
-        print(
+        logger.info(
             f"Uploaded batch {i // batch_size + 1}/{(total_chunks + batch_size - 1) // batch_size} ({len(batch)} chunks)"
         )
+    logger.info(f"Successfully uploaded all {total_chunks} chunks to Qdrant")

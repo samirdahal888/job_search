@@ -1,17 +1,24 @@
 #  LLM response in clear and natural language
 
 import google.generativeai as genai
+from datetime import datetime
 
 from config import settings
+from logger import get_logger
+logger = get_logger(__name__)
 
 genai.configure(api_key=settings.GEMINI_API_KEY)
 model = genai.GenerativeModel(settings.LLM_MODEL)
 
 
 def LLM_response(unique_job_results, original_query):
+    logger.info(f"Generating LLM response for {len(unique_job_results)} jobs")
     formatted_unique_jobs = format_job_for_response(unique_job_results)
     prompt = prompt_for_llm_response(formatted_unique_jobs, original_query)
 
+    logger.debug("Sending request to LLM for response generation")
+
+    start_time = datetime.now()
     response = model.generate_content(
         prompt,
         generation_config=genai.types.GenerationConfig(
@@ -19,8 +26,13 @@ def LLM_response(unique_job_results, original_query):
             max_output_tokens=settings.LLM_MAX_TOKENS,
         ),
     )
+    elapsed = (datetime.now()-start_time).total_seconds()
+    response_text = response.text.strip()
 
-    return response.text.strip()
+    logger.info(f"LLM response generated in {elapsed:.2f}s , {len(response_text)} chars")
+    logger.debug(f"Response preview: {response_text[:100]}...")
+
+    return response_text
 
 
 def format_job_for_response(unique_job_results):
@@ -42,6 +54,8 @@ def format_job_for_response(unique_job_results):
         snippet = text[:300] + "..." if len(text) > 300 else text
         data.append(f"Description:{snippet}")
 
+    logger.info("Formatting jobs to input in the LLM")
+
     return "\n".join(data)
 
 
@@ -62,5 +76,5 @@ def prompt_for_llm_response(jobs_text, original_query):
     Keep it brief and actionable.
 
     Summary:"""
-
+    logger.info("Created proper prompt with user query and jobs text for LLM response")
     return prompt

@@ -6,12 +6,15 @@ from pydantic import BaseModel, Field
 
 from config import settings
 from llm_response import LLM_response
+from logger import get_logger
 from query_to_semantic_and_filter import convert_query_to_semantic_and_filter
 from remove_duplicate_from_result import (
     sorted_unique_result_with_hig_score,
     unique_result_output,
 )
 from retrive_data_based_on_query import apply_filter, search
+
+logger = get_logger(__name__)
 
 app = FastAPI(
     title="RAG Application for Job search",
@@ -34,7 +37,7 @@ class JobResult(BaseModel):
     job_title: str
     company: str
     category: str
-    location: str
+    location: Optional[str] = None
     job_level: str
     job_id: str
     Publication_Date: Optional[str] = None
@@ -53,6 +56,7 @@ class QueryResponse(BaseModel):
 
 @app.get("/", tags=["Home"])
 def home():
+    logger.debug("Home endpoint accessed")
     return {
         "message": "LF Jobs RAG API",
         "version": 0.1,
@@ -65,6 +69,7 @@ def home():
 
 @app.post("/api/query", response_model=QueryResponse, tags=["Query"])
 def job_query(request: QueryRequest):
+    logger.info(f"New query request : {request.query} ,top : {request.top}")
     data = convert_query_to_semantic_and_filter(request.query)
     semantic = None
     filter = None
@@ -75,14 +80,16 @@ def job_query(request: QueryRequest):
         elif k == "filters":
             filter = v
 
-    print(f"\nThis is the semantic part ===={semantic}")
-    print(f"\nThis is the filter part ===={filter}")
+    logger.debug(f"Semantic query: {semantic}")
+    logger.debug(f"Filters:{filter}")
 
     filtered_value = apply_filter(filter)
     results = search(semantic, filtered_value, limit=request.top)
 
     unique_outputs = unique_result_output(results)
     unique_results = sorted_unique_result_with_hig_score(unique_outputs)
+    logger.info(f"Found {len(unique_results)}unique jobs")
+
     response_from_llm = LLM_response(unique_results, request.query)
 
     job_result = []
@@ -104,6 +111,7 @@ def job_query(request: QueryRequest):
                 Description_snippet=snippet,
             )
         )
+    logger.info(f"Query processed successfully, returning {len(job_result)} jobs")
 
     return QueryResponse(
         success=True,
