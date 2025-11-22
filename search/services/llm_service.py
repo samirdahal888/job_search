@@ -7,6 +7,7 @@ import google.generativeai as genai
 from api_config import api_config
 from common.logger import get_logger
 from search.config import SearchConfig
+from search.exceptions import LLMError
 
 config = SearchConfig()
 logger = get_logger(
@@ -26,27 +27,59 @@ def get_llm_response(unique_job_results, original_query):
 
     Returns:
         Generated response text
+
+    Raises:
+        LLMError: If LLM response generation fails
     """
+    # Principle 3: Validate inputs to prevent exceptions
+    if not unique_job_results:
+        logger.warning("Empty job results provided to LLM service")
+        raise LLMError("Cannot generate response for empty job results")
+
+    if not isinstance(unique_job_results, list):
+        logger.error(f"Invalid job results type: {type(unique_job_results)}")
+        raise LLMError("Invalid job results format")
+
+    if not original_query or not original_query.strip():
+        logger.warning("Empty query provided to LLM service")
+        raise LLMError("Cannot generate response for empty query")
+
     logger.info(f"Generating LLM response for {len(unique_job_results)} jobs")
+
     formatted_unique_jobs = format_job_for_response(unique_job_results)
     prompt = prompt_for_llm_response(formatted_unique_jobs, original_query)
 
     logger.debug("Sending request to LLM for response generation")
 
     start_time = datetime.now()
-    response = model.generate_content(
-        prompt,
-        generation_config=genai.types.GenerationConfig(
-            temperature=config.LLM_TEMPERATURE,
-            max_output_tokens=config.LLM_MAX_TOKENS,
-        ),
-    )
+
+    # Principle 2: Use specific exception handling for LLM API calls
+    try:
+        response = model.generate_content(
+            prompt,
+            generation_config=genai.types.GenerationConfig(
+                temperature=config.LLM_TEMPERATURE,
+                max_output_tokens=config.LLM_MAX_TOKENS,
+            ),
+        )
+    except Exception as e:
+        logger.error(f"LLM API call failed: {e}")
+        raise LLMError(f"Failed to generate response: {str(e)}") from e
+
     elapsed = (datetime.now() - start_time).total_seconds()
+
+    # Principle 3: Validate response before processing
+    if not response or not hasattr(response, "text"):
+        logger.error("Invalid LLM response structure")
+        raise LLMError("LLM returned invalid response structure")
+
+    if not response.text or not response.text.strip():
+        logger.error("LLM returned empty response")
+        raise LLMError("LLM returned empty response")
+
     response_text = response.text.strip()
 
-    logger.info(
-        f"LLM response generated in {elapsed:.2f}s , {len(response_text)} chars"
-    )
+    logger.info(f"LLM response generated in {elapsed:.2f}s, {len(response_text)} chars")
     logger.debug(f"Response preview: {response_text[:100]}...")
 
     return response_text

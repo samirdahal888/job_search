@@ -284,28 +284,55 @@ def convert_query_to_semantic_and_filter(query):
         query: Natural language search query
 
     Returns:
-        Dictionary with semantic_query and filters
+        Dictionary with semantic_query and filters, or None on failure
+
+    Note:
+        This function returns None on LLM failures to allow fallback to original query.
+        It does not raise exceptions as query parsing is not critical to search.
     """
-    logger.info(f"Parsing query:{query}")
+    # Principle 3: Validate inputs to prevent exceptions
+    if not query or not query.strip():
+        logger.warning("Empty query provided to parser")
+        return None
+
+    logger.info(f"Parsing query: {query}")
     prompt = build_parsing_prompt(query)
     logger.debug("Sending query to LLM for parsing")
 
     start_time = datetime.now()
 
-    response = model.generate_content(
-        prompt,
-        generation_config=genai.types.GenerationConfig(
-            temperature=config.LLM_TEMPERATURE,
-            max_output_tokens=config.LLM_MAX_TOKENS,
-        ),
-    )
+    # Principle 2: Use specific exception handling for LLM API calls
+    try:
+        response = model.generate_content(
+            prompt,
+            generation_config=genai.types.GenerationConfig(
+                temperature=config.LLM_TEMPERATURE,
+                max_output_tokens=config.LLM_MAX_TOKENS,
+            ),
+        )
+    except Exception as e:
+        # LLM failures should not break search - return None to use original query
+        logger.warning(f"LLM API call failed during query parsing: {e}")
+        return None
+
     elapsed = (datetime.now() - start_time).total_seconds()
     logger.debug(f"LLM response received in {elapsed:.2f}s")
+
+    # Principle 3: Check response validity before processing
+    if not response or not hasattr(response, "text"):
+        logger.warning("Invalid LLM response structure")
+        return None
+
+    if not response.text or not response.text.strip():
+        logger.warning("Empty LLM response text")
+        return None
+
     result = extract_json_from_response(response.text)
 
     if result:
         logger.info("Query parsed successfully")
+        logger.debug(f"Parsed result: {result}")
     else:
-        logger.warning("Failed to parse LLM response")
+        logger.warning("Failed to parse LLM response, will use original query")
 
     return result
