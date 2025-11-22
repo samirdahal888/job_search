@@ -1,15 +1,17 @@
+"""Main entry point for the application"""
+
 import uvicorn
-from config import settings
 
+from api_config import api_config
+from api_factory import create_app
 
-def main():
-    uvicorn.run(
-        "api:app",
-        host=settings.API_HOST,
-        port=settings.API_PORT,
-        reload=True,
-    )
+app = create_app()
 
 
 if __name__ == "__main__":
-    main()
+    uvicorn.run(
+        "main:app",
+        host=api_config.API_HOST,
+        port=api_config.API_PORT,
+        reload=True,
+    )
