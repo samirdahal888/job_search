@@ -1,8 +1,11 @@
 """API factory for creating FastAPI application"""
 
-from fastapi import FastAPI
+from typing import Never
+
+from fastapi import FastAPI, Request
 
 from api_config import api_config
+from common.exception import JobSearchError
 from common.logger import get_logger
 from search.routers.search import router as search_router
 
@@ -23,6 +26,13 @@ def create_app() -> FastAPI:
         version="0.1",
         redoc_url="/redocs",
     )
+
+    # Register exception handler
+    @app.exception_handler(JobSearchError)
+    async def job_search_error_handler(_: Request, exc: JobSearchError) -> Never:
+        """Handle JobSearchError exceptions and convert to HTTPException"""
+        logger.error(f"JobSearchError caught: {exc.message} (Code: {exc.code})")
+        raise exc.to_http_exception()
 
     # Include routers
     app.include_router(search_router)
