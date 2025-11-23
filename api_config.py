@@ -2,7 +2,7 @@
 
 from pydantic import Field
 
-from common.base_config import BaseConfig
+from common.config.base_config import BaseConfig
 
 
 class APIConfig(BaseConfig):

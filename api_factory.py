@@ -10,7 +10,7 @@ from common.logger import get_logger
 from search.routers.search import router as search_router
 
 logger = get_logger(
-    __name__, api_config.LOG_LEVEL, api_config.LOG_TO_CONSOLE, api_config.LOG_TO_FILE
+    __name__,
 )
 
 
