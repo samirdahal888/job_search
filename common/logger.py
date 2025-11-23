@@ -3,6 +3,9 @@ import sys
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import Optional
+from common.config.logger_config import loggerConfig
+
+config = loggerConfig()
 
 
 class ColoredFormatter(logging.Formatter):
@@ -79,9 +82,9 @@ def setup_logger(
 
 def get_logger(
     name: str,
-    log_level: str = "DEBUG",
-    log_to_console: bool = True,
-    log_to_file: bool = False,
+    log_level: str =config.LOG_LEVEL,
+    log_to_console: bool = config.LOG_TO_CONSOLE,
+    log_to_file: bool = config.LOG_TO_FILE,
 ):
     return setup_logger(
         name,
