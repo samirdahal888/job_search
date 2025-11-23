@@ -6,11 +6,12 @@ from qdrant_client import models
 
 from common.config.qdrant_config import QdrantConfig
 from common.logger import get_logger
-from data_ingestion.qdrant_client import client, collection_name
+from data_ingestion.qdrant_client import QdrantInjectionService
 from search.exceptions import VectorDatabaseError
 
 config = QdrantConfig()
 logger = get_logger(__name__)
+qdrant_injection_service = QdrantInjectionService(config)
 
 
 def create_filter_object(filter_dict: dict) -> models.Filter:
@@ -100,8 +101,8 @@ def search(query: str, filters=None, limit=5) -> list[models.ScoredPoint]:
 
     # Principle 2: Use specific exception handling for Qdrant operations
     try:
-        response = client.query_points(
-            collection_name=collection_name,
+        response = qdrant_injection_service.client.query_points(
+            collection_name=qdrant_injection_service.collection_name,
             prefetch=[
                 models.Prefetch(
                     query=models.Document(text=query, model=config.SPARSE_MODEL),
