@@ -4,7 +4,7 @@ from pathlib import Path
 
 from pydantic import Field, field_validator
 
-from common.base_config import BaseConfig
+from common.config.base_config import BaseConfig
 
 
 class DataIngestionConfig(BaseConfig):
