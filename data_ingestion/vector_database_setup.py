@@ -1,26 +1,25 @@
 """Vector database setup script"""
 
+import pandas as pd
+
 from common.logger import get_logger
 from common.utils import remove_html_tags
 from data_ingestion.config import DataIngestionConfig
 from data_ingestion.create_chunks import create_chunks
-from data_ingestion.ingestion import load_data
 from data_ingestion.qdrant_client import (
     create_field_indexes,
     upload_chunks_to_vector_db,
 )
 
 config = DataIngestionConfig()
-logger = get_logger(
-    __name__, config.LOG_LEVEL, config.LOG_TO_CONSOLE, config.LOG_TO_FILE
-)
+logger = get_logger(__name__)
 
 
 def setup_vector_database():
     """Main function to setup vector database with job data"""
     logger.info("Starting database setup process")
     logger.info("Loading data from the CSV")
-    data = load_data()
+    data = pd.read_csv(config.CSV_FILE_PATH)
     logger.info(f"Loaded {len(data)} job records")
 
     logger.info("Cleaning HTML from job description")
