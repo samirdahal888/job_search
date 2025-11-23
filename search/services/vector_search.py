@@ -4,15 +4,13 @@ from datetime import datetime
 
 from qdrant_client import models
 
+from common.config.qdrant_config import QdrantConfig
 from common.logger import get_logger
-from common.qdrant_config import QdrantConfig
 from data_ingestion.qdrant_client import client, collection_name
 from search.exceptions import VectorDatabaseError
 
 config = QdrantConfig()
-logger = get_logger(
-    __name__, config.LOG_LEVEL, config.LOG_TO_CONSOLE, config.LOG_TO_FILE
-)
+logger = get_logger(__name__)
 
 
 def create_filter_object(filter_dict):
