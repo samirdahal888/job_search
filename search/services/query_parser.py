@@ -11,7 +11,7 @@ from search.config import SearchConfig
 
 config = SearchConfig()
 logger = get_logger(
-    __name__, config.LOG_LEVEL, config.LOG_TO_CONSOLE, config.LOG_TO_FILE
+    __name__,
 )
 
 genai.configure(api_key=config.GEMINI_API_KEY)

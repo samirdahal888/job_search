@@ -10,9 +10,7 @@ from search.config import SearchConfig
 from search.exceptions import LLMError
 
 config = SearchConfig()
-logger = get_logger(
-    __name__, config.LOG_LEVEL, config.LOG_TO_CONSOLE, config.LOG_TO_FILE
-)
+logger = get_logger(__name__)
 
 genai.configure(api_key=config.GEMINI_API_KEY)
 model = genai.GenerativeModel(config.LLM_MODEL)

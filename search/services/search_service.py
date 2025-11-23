@@ -11,9 +11,7 @@ from search.services.query_parser import convert_query_to_semantic_and_filter
 from search.services.vector_search import create_filter_object, search
 
 config = SearchConfig()
-logger = get_logger(
-    __name__, config.LOG_LEVEL, config.LOG_TO_CONSOLE, config.LOG_TO_FILE
-)
+logger = get_logger(__name__)
 
 
 class SearchService:
