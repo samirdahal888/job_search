@@ -3,13 +3,10 @@
 import pandas as pd
 
 from common.logger import get_logger
-from common.utils import remove_html_tags
+from common.utils.remove_html_tags import remove_html_tags
 from data_ingestion.config import DataIngestionConfig
 from data_ingestion.create_chunks import create_chunks
-from data_ingestion.qdrant_client import (
-    create_field_indexes,
-    upload_chunks_to_vector_db,
-)
+from data_ingestion.qdrant_client import QdrantInjectionService
 
 config = DataIngestionConfig()
 logger = get_logger(__name__)
@@ -17,6 +14,8 @@ logger = get_logger(__name__)
 
 def setup_vector_database():
     """Main function to setup vector database with job data"""
+    qdrant_injection_service = QdrantInjectionService(config)
+
     logger.info("Starting database setup process")
     logger.info("Loading data from the CSV")
     data = pd.read_csv(config.CSV_FILE_PATH)
@@ -50,11 +49,11 @@ def setup_vector_database():
     logger.info(f"Created {len(all_chunks)} chunks from {len(data)} data")
 
     logger.info("Uploading chunks to Qdrant")
-    upload_chunks_to_vector_db(all_chunks)
+    qdrant_injection_service.upload_chunks_to_vector_db(all_chunks)
 
     logger.info("creating field indexes")
     field_names = ["category", "location", "company", "Level", "publication_date"]
-    create_field_indexes(field_names)
+    qdrant_injection_service.create_field_indexes(field_names)
     logger.info(f"Created index for fields: {field_names}")
 
     logger.info("Database setup completed successfully")
