@@ -3,7 +3,8 @@
 from typing import Any, List, Tuple
 
 from common.logger import get_logger
-from common.utils import find_unique_results, sort_results_by_score
+from common.utils.find_unique_results import find_unique_results
+from common.utils.sort_results_by_score import sort_results_by_score
 from search.config import SearchConfig
 from search.exceptions import LLMError, SearchError, VectorDatabaseError
 from search.services.llm_service import get_llm_response
