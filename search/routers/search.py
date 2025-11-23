@@ -20,7 +20,7 @@ router = APIRouter(prefix="/api", tags=["Search"])
 @router.post("/query", response_model=QueryResponse)
 def job_query(
     request: QueryRequest, search_service: SearchService = Depends(get_search_service)
-):
+) -> QueryResponse:
     """
     Search for jobs using natural language query.
 

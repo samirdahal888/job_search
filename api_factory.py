@@ -4,7 +4,6 @@ from typing import Never
 
 from fastapi import FastAPI, Request
 
-from api_config import api_config
 from common.exception import JobSearchError
 from common.logger import get_logger
 from search.routers.search import router as search_router
@@ -38,7 +37,7 @@ def create_app() -> FastAPI:
     app.include_router(search_router)
 
     @app.get("/", tags=["Root"])
-    def root():
+    def root() -> dict:
         logger.debug("Home endpoint accessed")
         return {
             "message": "LF Jobs RAG API",

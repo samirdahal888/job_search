@@ -18,7 +18,7 @@ genai.configure(api_key=config.GEMINI_API_KEY)
 model = genai.GenerativeModel(config.LLM_MODEL)
 
 
-def build_parsing_prompt(query):
+def build_parsing_prompt(query: str) -> str:
     """
     Build the prompt for LLM query parsing
 
@@ -277,7 +277,7 @@ def extract_json_from_response(response_text: str) -> Optional[Dict[str, Any]]:
         return None
 
 
-def convert_query_to_semantic_and_filter(query):
+def convert_query_to_semantic_and_filter(query: str) -> Optional[Dict[str, Any]]:
     """Convert natural language query to semantic query and filters
 
     Args:

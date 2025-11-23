@@ -13,7 +13,7 @@ config = QdrantConfig()
 logger = get_logger(__name__)
 
 
-def create_filter_object(filter_dict):
+def create_filter_object(filter_dict: dict) -> models.Filter:
     """Create Qdrant filter object from filter dictionary
 
     Args:

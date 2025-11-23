@@ -16,7 +16,7 @@ genai.configure(api_key=config.GEMINI_API_KEY)
 model = genai.GenerativeModel(config.LLM_MODEL)
 
 
-def get_llm_response(unique_job_results, original_query):
+def get_llm_response(unique_job_results: list, original_query: str) -> str:
     """Generate natural language response from search results
 
     Args:
@@ -83,7 +83,7 @@ def get_llm_response(unique_job_results, original_query):
     return response_text
 
 
-def format_job_for_response(unique_job_results):
+def format_job_for_response(unique_job_results: list) -> str:
     """Format job results for LLM prompt
 
     Args:
@@ -121,7 +121,7 @@ def format_job_for_response(unique_job_results):
     return "\n".join(data)
 
 
-def prompt_for_llm_response(formatted_jobs, query):
+def prompt_for_llm_response(formatted_jobs: str, query: str) -> str:
     """Create prompt for LLM response generation
 
     Args:

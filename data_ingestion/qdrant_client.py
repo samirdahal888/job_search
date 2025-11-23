@@ -31,7 +31,7 @@ class QdrantClientManager:
         # Ensure collection exists
         self._ensure_collection_exists()
 
-    def _ensure_collection_exists(self):
+    def _ensure_collection_exists(self) -> None:
         """Create collection if it doesn't exist"""
         if not self.client.collection_exists(self.collection_name):
             self.logger.info(f"Creating new collection: {self.collection_name}")
@@ -53,7 +53,9 @@ class QdrantClientManager:
                 f"Collection name already exist: {self.collection_name} using it."
             )
 
-    def upload_chunks_to_vector_db(self, chunks_with_metadata, batch_size=50):
+    def upload_chunks_to_vector_db(
+        self, chunks_with_metadata: list, batch_size: int = 50
+    ) -> None:
         """
         Upload chunks in batches to avoid payload size limits
 
@@ -95,7 +97,7 @@ class QdrantClientManager:
             )
         self.logger.info(f"Successfully uploaded all {total_chunks} chunks to Qdrant")
 
-    def create_field_indexes(self, field_names):
+    def create_field_indexes(self, field_names: list) -> None:
         """Create text indexes for filterable fields
 
         Args:
