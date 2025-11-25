@@ -6,7 +6,7 @@ from qdrant_client import models
 
 from common.config.qdrant_config import QdrantConfig
 from common.logger import get_logger
-from data_ingestion.qdrant_client import QdrantInjectionService
+from data_ingestion.qdrant_injection_service import QdrantInjectionService
 from search.exceptions import VectorDatabaseError
 
 config = QdrantConfig()

@@ -6,7 +6,7 @@ from common.logger import get_logger
 from common.utils.remove_html_tags import remove_html_tags
 from data_ingestion.config import DataIngestionConfig
 from data_ingestion.create_chunks import create_chunks
-from data_ingestion.qdrant_client import QdrantInjectionService
+from data_ingestion.qdrant_injection_service import QdrantInjectionService
 
 config = DataIngestionConfig()
 logger = get_logger(__name__)
