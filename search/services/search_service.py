@@ -1,13 +1,12 @@
-"""Main search service orchestrating query processing and response generation"""
+"""Main search service orchestrating query processing"""
 
-from typing import Any, List, Tuple
+from typing import Any, List
 
 from common.logger import get_logger
 from common.utils.find_unique_results import find_unique_results
 from common.utils.sort_results_by_score import sort_results_by_score
 from search.config import SearchConfig
-from search.exceptions import LLMError, SearchError, VectorDatabaseError
-from search.services.llm_service import get_llm_response
+from search.exceptions import SearchError, VectorDatabaseError
 from search.services.query_parser import convert_query_to_semantic_and_filter
 from search.services.vector_search import create_filter_object, search
 
@@ -21,18 +20,16 @@ class SearchService:
     def __init__(self):
         self.logger = logger
 
-    def search_jobs_and_generate_response(
-        self, query: str, top: int
-    ) -> Tuple[List[Any], str]:
+    def search(self, query: str, top: int) -> List[Any]:
         """
-        Search for jobs based on query and generate AI-powered response.
+        Search for jobs based on query.
 
         Args:
             query: The search query string
             top: Maximum number of results to return
 
         Returns:
-            Tuple of (job_results, llm_response)
+            List of job search results
 
         Raises:
             SearchError: If search operation fails
@@ -87,34 +84,7 @@ class SearchService:
 
         self.logger.info(f"Found {len(final_results)} unique job results")
 
-        try:
-            llm_response = get_llm_response(final_results, query)
-        except LLMError as e:
-            self.logger.warning(f"LLM response generation failed: {e}, using fallback")
-            llm_response = self._generate_fallback_response(final_results, query)
-        except Exception as e:
-            self.logger.error(f"Unexpected error in LLM response: {e}")
-            llm_response = self._generate_fallback_response(final_results, query)
-
-        return final_results, llm_response
-
-    def _generate_fallback_response(self, results: List[Any], query: str) -> str:
-        """Generate a simple fallback response when LLM fails
-
-        Args:
-            results: Search results
-            query: Original query
-
-        Returns:
-            Fallback response string
-        """
-        count = len(results)
-        if count == 0:
-            return f"No jobs found matching '{query}'."
-        elif count == 1:
-            return f"Found 1 job matching '{query}'. Please review the results below."
-        else:
-            return f"Found {count} jobs matching '{query}'. The results are sorted by relevance."
+        return final_results
 
 
 def get_search_service() -> SearchService:
