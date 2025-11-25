@@ -32,7 +32,6 @@ def job_query(
         QueryResponse with matching jobs and LLM-generated response
 
     Raises:
-        InvalidQueryError: If query is empty or invalid
         SearchError: If search operation fails
     """
     logger.info(f"Processing query: '{request.query}' (top={request.top})")
