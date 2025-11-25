@@ -22,19 +22,19 @@ This project implements an advanced hybrid job search and retrieval system that 
 ## Screenshots
 
 ### Application Startup
-![Server Logging](screenshots/logging_while_starting_server.png)
+![Server Logging](docs/screenshots/logging_while_starting_server.png)
 
 ### FastAPI Swagger UI
-![Swagger Interface](screenshots/swagger_ui.png)
+![Swagger Interface](docs/screenshots/swagger_ui.png)
 
 ### API Query Endpoint
-![Query Endpoint](screenshots/api_query_endpoint.png)
+![Query Endpoint](docs/screenshots/api_query_endpoint.png)
 
 ### API Response
-![Endpoint Response](screenshots/endpoint_response.png)
+![Endpoint Response](docs/screenshots/endpoint_response.png)
 
 ### Logging After Query Request
-![Query Logging](screenshots/logging_after_query_request.png)
+![Query Logging](docs/screenshots/logging_after_query_request.png)
 
 ---
 
