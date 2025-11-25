@@ -51,7 +51,6 @@ def job_query(
 
     job_result = []
     for i, point in enumerate(unique_results, 1):
-        # Principle 3: Validate point has required attributes
         if not hasattr(point, "payload") or not hasattr(point, "score"):
             logger.warning(f"Invalid point structure at index {i}")
             continue

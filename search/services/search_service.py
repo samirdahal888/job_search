@@ -38,7 +38,6 @@ class SearchService:
             SearchError: If search operation fails
             VectorDatabaseError: If vector database operation fails
         """
-        # Principle 3: Validate inputs to prevent exceptions
         if not query or not query.strip():
             self.logger.error("Empty query provided to search service")
             raise SearchError("Query cannot be empty")
@@ -49,8 +48,6 @@ class SearchService:
 
         self.logger.info(f"Processing search query: '{query}' (top={top})")
 
-        # Parse query into semantic search and filters
-        # Query parser handles its own exceptions
         parsed_query = convert_query_to_semantic_and_filter(query)
 
         if not parsed_query:
@@ -65,19 +62,14 @@ class SearchService:
         self.logger.debug(f"Semantic query: {semantic_query}")
         self.logger.debug(f"Filters: {filter_dict if parsed_query else 'None'}")
 
-        # Principle 2: Use specific exception handling, not catch-all
         try:
-            # Perform search - can raise VectorDatabaseError
             results = search(semantic_query, filters=filters, limit=top * 3)
         except VectorDatabaseError:
-            # Re-raise specific vector database errors
             raise
         except Exception as e:
-            # Only catch truly unexpected errors
             self.logger.error(f"Unexpected error during vector search: {e}")
             raise SearchError(f"Search operation failed: {str(e)}") from e
 
-        # Principle 3: Validate results before processing
         if results is None:
             self.logger.error("Vector search returned None")
             raise SearchError("Search operation returned invalid results")
@@ -95,11 +87,9 @@ class SearchService:
 
         self.logger.info(f"Found {len(final_results)} unique job results")
 
-        # Generate LLM response - use fallback on failure
         try:
             llm_response = get_llm_response(final_results, query)
         except LLMError as e:
-            # Principle 2: Don't control flow with exceptions, but provide fallback
             self.logger.warning(f"LLM response generation failed: {e}, using fallback")
             llm_response = self._generate_fallback_response(final_results, query)
         except Exception as e:

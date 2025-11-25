@@ -29,7 +29,6 @@ def get_llm_response(unique_job_results: list, original_query: str) -> str:
     Raises:
         LLMError: If LLM response generation fails
     """
-    # Principle 3: Validate inputs to prevent exceptions
     if not unique_job_results:
         logger.warning("Empty job results provided to LLM service")
         raise LLMError("Cannot generate response for empty job results")
@@ -51,7 +50,6 @@ def get_llm_response(unique_job_results: list, original_query: str) -> str:
 
     start_time = datetime.now()
 
-    # Principle 2: Use specific exception handling for LLM API calls
     try:
         response = model.generate_content(
             prompt,
@@ -66,7 +64,6 @@ def get_llm_response(unique_job_results: list, original_query: str) -> str:
 
     elapsed = (datetime.now() - start_time).total_seconds()
 
-    # Principle 3: Validate response before processing
     if not response or not hasattr(response, "text"):
         logger.error("Invalid LLM response structure")
         raise LLMError("LLM returned invalid response structure")

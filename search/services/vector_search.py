@@ -23,7 +23,6 @@ def create_filter_object(filter_dict: dict) -> models.Filter:
     Returns:
         Qdrant Filter object
     """
-    # Principle 3: Validate inputs to prevent exceptions
     if not filter_dict:
         logger.info("No filters provided, returning empty filter")
         return models.Filter(must=[])
@@ -61,9 +60,7 @@ def create_filter_object(filter_dict: dict) -> models.Filter:
                         )
                     )
             except Exception as e:
-                # Principle 2: Don't fail entire operation for one bad filter
                 logger.warning(f"Failed to add filter {key}={value}: {e}")
-                # Continue with other filters
 
     if conditions:
         logger.info(f"Created {len(conditions)} filter condition(s)")
@@ -87,7 +84,6 @@ def search(query: str, filters=None, limit=5) -> list[models.ScoredPoint]:
     Raises:
         VectorDatabaseError: If search operation fails
     """
-    # Principle 3: Validate inputs to prevent exceptions
     if not query or not query.strip():
         logger.warning("Empty query provided to vector search")
         return []
@@ -99,7 +95,6 @@ def search(query: str, filters=None, limit=5) -> list[models.ScoredPoint]:
     logger.info(f"Searching for: '{query}', limit: {limit}")
     start_time = datetime.now()
 
-    # Principle 2: Use specific exception handling for Qdrant operations
     try:
         response = qdrant_injection_service.client.query_points(
             collection_name=qdrant_injection_service.collection_name,
@@ -125,7 +120,6 @@ def search(query: str, filters=None, limit=5) -> list[models.ScoredPoint]:
 
     elapsed = (datetime.now() - start_time).total_seconds()
 
-    # Principle 3: Validate response structure
     if not response or not hasattr(response, "points"):
         logger.error("Invalid response from Qdrant: missing 'points' attribute")
         raise VectorDatabaseError("Vector database returned invalid response")
