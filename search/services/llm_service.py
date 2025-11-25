@@ -33,10 +33,6 @@ def get_llm_response(unique_job_results: list, original_query: str) -> str:
         logger.warning("Empty job results provided to LLM service")
         raise LLMError("Cannot generate response for empty job results")
 
-    if not isinstance(unique_job_results, list):
-        logger.error(f"Invalid job results type: {type(unique_job_results)}")
-        raise LLMError("Invalid job results format")
-
     if not original_query or not original_query.strip():
         logger.warning("Empty query provided to LLM service")
         raise LLMError("Cannot generate response for empty query")
