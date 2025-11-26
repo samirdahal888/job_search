@@ -122,3 +122,5 @@ uv run python main.py
 
 This Intelligent Job Search System represents a modern approach to job discovery, combining the power of AI with practical engineering solutions. By merging traditional keyword search (BM25) with semantic understanding (AI embeddings), users get the best of both worlds - precise matches and intelligent recommendations.
 
+<!-- lets add google docs link here -->
+Documentation: [Project Documentation](https://docs.google.com/document/d/1h1oOVsXOgeVSM1UQmF0EY2tjMRC5xNRdlzTpzP8_KZs/edit?usp=sharing).
