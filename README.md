@@ -1,4 +1,5 @@
 # RAG Pipeline for Job Data Retrieval
+**Live Demo**: [http://4.194.251.123:8000/docs](http://4.194.251.123:8000/docs)
 
 This project implements an advanced hybrid job search and retrieval system that intelligently processes natural language queries. The system combines BM25 (sparse) and semantic (dense) vector search techniques, powered by Qdrant Vector Database and Google Gemini AI. It automatically extracts search filters from user queries, performs hybrid search using Reciprocal Rank Fusion, and generates user-friendly responses in natural language.
 
